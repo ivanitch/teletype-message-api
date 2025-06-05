@@ -1,0 +1,40 @@
+{
+    "name": "ivanitch/teletype-message-api",
+    "description": "teletype-message-api",
+    "keywords": ["yii2", "api", "teletype"],
+    "type": "project",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Sergey Ivanov",
+            "email": "amurweb@gmail.com",
+            "telegram": "https://telegram.me/sai_256"
+        }
+    ],
+    "require": {
+        "php": ">=8.4.0",
+        "yiisoft/yii2": "~2.0.45"
+    },
+    "require-dev": {
+        "yiisoft/yii2-faker": "~2.0.0",
+        "codeception/codeception": "^5.0.0 || ^4.0",
+        "codeception/lib-innerbrowser": "^4.0 || ^3.0 || ^1.1",
+        "codeception/module-asserts": "^3.0 || ^1.1",
+        "codeception/module-yii2": "^1.1",
+        "codeception/module-filesystem": "^3.0 || ^2.0 || ^1.1",
+        "codeception/verify": "^3.0 || ^2.2",
+        "symfony/var-dumper": "^7.3"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ]
+}
