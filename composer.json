@@ -7,13 +7,12 @@
     "authors": [
         {
             "name": "Sergey Ivanov",
-            "email": "amurweb@gmail.com",
-            "telegram": "https://telegram.me/sai_256"
+            "email": "amurweb@gmail.com"
         }
     ],
     "require": {
         "php": ">=8.4.0",
-        "yiisoft/yii2": "~2.0.45"
+        "yiisoft/yii2": "~2.0.52"
     },
     "require-dev": {
         "yiisoft/yii2-faker": "~2.0.0",
@@ -36,5 +35,10 @@
             "type": "composer",
             "url": "https://asset-packagist.org"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "api\\": "src/"
+        }
+    }
 }

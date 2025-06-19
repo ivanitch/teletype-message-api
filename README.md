@@ -7,13 +7,24 @@
 ![PHP-FPM](https://img.shields.io/badge/PHP_FPM-8.4-777BB4?logo=php&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.5-4169E1?logo=postgresql&logoColor=white)
 
-## Установка ✨
-```bash  
-# В текущую директорию
+## Установка проекта ✨
+```bash
+git clone git@github.com:ivanitch/teletype-message-api.git teletype-message-api
+
+# Или в текущую директорию
 git clone git@github.com:ivanitch/teletype-message-api.git .
 ```
 
-## Запуск 🚀
+## Запуск контейнеров Docker 🚀
 ```bash  
 make build && make up && make app
+```
+
+## В Postman 
+```
+GET http://teletype-message.loc
+```
+Видим:
+```
+Hello world! 👋
 ```

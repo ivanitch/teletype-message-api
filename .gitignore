@@ -1,4 +1,4 @@
 .idea
-/docker/log/
-/docker/pgdata/
-/api/vendor/
+/vendor/
+/.docker/log/
+/.docker/pgdata/
