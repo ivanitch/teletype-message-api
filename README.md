@@ -20,11 +20,16 @@ git clone git@github.com:ivanitch/teletype-message-api.git .
 make build && make up && make app
 ```
 
-## В Postman 
+## В Docker-контейнере установить зависимости
+```
+composer install
+```
+
+## В Postman обратиться по адресу
 ```
 GET http://teletype-message.loc
 ```
 Видим:
 ```
-Hello world! 👋
+Hello world! 👋 | Yii version 2.0.52
 ```
