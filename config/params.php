@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'hostInfo' => 'http://teletype-message.loc',
+    'hostInfo' => 'http://neo-teletype.app',
 ];

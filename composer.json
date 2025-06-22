@@ -12,7 +12,9 @@
     ],
     "require": {
         "php": ">=8.4.0",
-        "yiisoft/yii2": "~2.0.52"
+        "yiisoft/yii2": "~2.0.52",
+        "yiisoft/yii2-httpclient": "~2.0.0",
+        "ext-http": "*"
     },
     "require-dev": {
         "yiisoft/yii2-faker": "~2.0.0",

@@ -25,11 +25,15 @@ make build && make up && make app
 composer install
 ```
 
-## В Postman обратиться по адресу
+## Postman
 ```
-GET http://teletype-message.loc
+GET https://neo-teletype.app/
 ```
 Видим:
 ```
 Hello world! 👋 | Yii version 2.0.52
 ```
+
+## Дополнительно 🔗
+- [Описание задачи](Task.md)
+- [Решение задачи](Solution.md)

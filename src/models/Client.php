@@ -10,30 +10,35 @@ use yii\db\ActiveRecord;
 /**
  * Клиент
  *
- * @property integer $id
- * @property string $external_client_id
- * @property string $client_phone
- * @property integer $created_at
+ * @property integer $id ID записи
+ * @property string $external_client_id Уникальный внешний идентификатор клиента
+ * @property string $client_phone Уникальный номер телефона клиента
  *
- * @property Dialog $dialog
+ * @property-read Dialog $dialog Связь с диалогом клиента
  */
 class Client extends ActiveRecord
 {
     public static function tableName(): string
     {
-        return 'clients';
+        return '{{%clients}}';
     }
 
     public function rules(): array
     {
         return [
-            [['external_client_id', 'phone'], 'required'],
+            [['external_client_id', 'client_phone'], 'required'],
             ['external_client_id', 'string', 'length' => 32],
-            ['phone', 'match', 'pattern' => '/^\+7\d{10}$/'],
-            ['phone', 'string', 'length' => 12],
+            ['client_phone', 'match', 'pattern' => '/^\+7\d{10}$/'],
+            ['client_phone', 'string', 'length' => 12],
+            [['external_client_id', 'client_phone'], 'unique'],
         ];
     }
 
+    /**
+     * Связь с диалогом для этого клиента
+     *
+     * @return ActiveQuery
+     */
     public function getDialog(): ActiveQuery
     {
         return $this->hasOne(Dialog::class, ['client_id' => 'id']);

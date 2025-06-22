@@ -9,35 +9,47 @@ $db         = require __DIR__ . '/db.php';
 $urlManager = require __DIR__ . '/urlManager.php';
 
 $config = [
-    'id'         => 'teletype-app',
-    'basePath'   => dirname(__DIR__),
-    'homeUrl' => '/',
-    'defaultRoute' => 'main/index',
-    'bootstrap'  => ['log'],
+    'id'                  => 'teletype-app',
+    'basePath'            => dirname(__DIR__),
+    'homeUrl'             => '/',
+    'defaultRoute'        => 'hello/index',
+    'bootstrap'           => ['log'],
     'controllerNamespace' => 'api\controllers',
-    'components' => [
+    'components'          => [
         'request'    => [
             'cookieValidationKey' => 'yA5FATSDaF1g1WwPiycAI1Y_9qJO7cJj',
-            'parsers' => [
+            'parsers'             => [
                 'application/json' => JsonParser::class,
             ],
+        ],
+        'user'       => [
+            'identityClass'   => false,
+            'enableAutoLogin' => false,
+            'enableSession'   => false,
         ],
         'cache'      => [
             'class' => FileCache::class,
         ],
-        'log' => [
+        'log'        => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
-            'targets' => [
+            'targets'    => [
                 [
-                    'class' => FileTarget::class,
+                    'class'  => FileTarget::class,
                     'levels' => ['error', 'warning', 'info'],
+                    // Исключаем ненужные сообщения. На уровне `info` ловим только дубликаты сообщения
+                    'except' => [
+                        'yii\filters\RateLimiter::beforeAction',
+                        'yii\db\Connection::open',
+                        'yii\db\Command::query',
+                        'yii\db\Command::execute',
+                    ],
                 ],
             ],
         ],
         'db'         => $db,
         'urlManager' => $urlManager,
     ],
-    'params'     => $params,
+    'params'              => $params,
 ];
 
 return $config;

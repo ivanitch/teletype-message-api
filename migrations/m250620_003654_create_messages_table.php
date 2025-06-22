@@ -9,25 +9,33 @@ class m250620_003654_create_messages_table extends Migration
     public function safeUp(): void
     {
         $this->createTable(self::MESSAGES_TABLE, [
-            'id'                  => $this->primaryKey(),
-            'dialog_id'           => $this->integer()->unique()->notNull()->comment('Уникальный идентификатор диалога'),
-            'external_message_id' => $this->char(32)->notNull()->unique()->comment('Уникальный идентификатор сообщения'),
-            'message_text'        => $this->text()->notNull()->comment('Сообшение'),
-            'send_at'             => $this->integer()->notNull()->comment('Дата и время отправки сообщения'),
-            'created_at'          => $this->integer()->notNull()->defaultExpression('EXTRACT(EPOCH FROM NOW())')->comment('Дата создания сообщения'),
+            'id' => $this->primaryKey(),
+
+            'dialog_id' => $this->integer()
+                ->notNull()
+                ->comment('Идентификатор диалога'),
+
+            'external_client_id' => $this->char(32)
+                ->notNull()
+                ->comment('Идентификатор клиента'),
+
+            'external_message_id' => $this->char(32)
+                ->notNull()
+                ->comment('Уникальный идентификатор сообщения'),
+
+            'message_text' => $this->text()
+                ->notNull()
+                ->comment('Сообшение'),
+
+            'send_at' => $this->integer()
+                ->notNull()
+                ->comment('Дата и время отправки сообщения'),
         ]);
 
         $this->createIndex(
-            'idx-messages-external_message_id',
+            'idx-unique-client-dialog-message',
             self::MESSAGES_TABLE,
-            'external_message_id',
-            true
-        );
-
-        $this->createIndex(
-            'idx-messages-dialog_id',
-            self::MESSAGES_TABLE,
-            'dialog_id',
+            ['dialog_id', 'external_client_id', 'external_message_id'],
             true
         );
 
@@ -37,6 +45,16 @@ class m250620_003654_create_messages_table extends Migration
             'dialog_id',
             '{{%dialogs}}',
             'id',
+            'CASCADE',
+            'CASCADE'
+        );
+
+        $this->addForeignKey(
+            'fk-messages-external_client_id',
+            self::MESSAGES_TABLE,
+            'external_client_id',
+            '{{%clients}}',
+            'external_client_id',
             'CASCADE',
             'CASCADE'
         );

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace api\controllers;
 
-use yii\web\Controller;
-
-class HelloController extends Controller
+class HelloController extends BaseRestController
 {
     public function actionIndex(): string
     {
