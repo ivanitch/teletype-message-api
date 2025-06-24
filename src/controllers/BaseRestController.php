@@ -1,6 +1,6 @@
 <?php
 
-namespace api\controllers;
+namespace src\controllers;
 
 use Yii;
 use yii\filters\ContentNegotiator;

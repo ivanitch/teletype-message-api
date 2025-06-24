@@ -13,12 +13,10 @@ class m250619_103644_create_clients_table extends Migration
 
             'external_client_id' => $this->char(32)
                 ->notNull()
-                ->unique()
                 ->comment('Уникальный внешний идентификатор клиента'),
 
             'client_phone' => $this->string(12)
                 ->notNull()
-                ->unique()
                 ->comment('Номер телефона клиента'),
         ]);
 

@@ -2,56 +2,46 @@
 
 declare(strict_types=1);
 
-namespace api\controllers\v1;
+namespace src\controllers\v1;
 
-use api\controllers\BaseRestController;
-use api\forms\MessageForm;
-use api\models\Message;
-use api\services\MessageService;
+use src\controllers\BaseRestController;
+use src\forms\MessageForm;
+use src\models\Message;
+use src\services\MessageService;
 use Throwable;
 use Yii;
-use yii\filters\ContentNegotiator;
+use yii\db\Exception;
+use yii\helpers\Json;
 use yii\web\BadRequestHttpException;
-use yii\web\Response;
+
 
 /**
- *
+ * Контроллер для добавления собщения
+ * 👉 Клиент ((`external_id` - external message device) + `phone`)
+ *          -> Один Диалог для одного Клиента
+ *              -> Уникальное Сообщение в диалоге
  */
 class MessageController extends BaseRestController
 {
     /**
      * @param $id
      * @param $module
-     * @param MessageService $messageService
+     * @param MessageService $service
      * @param array $config
      */
     public function __construct(
         $id,
         $module,
-        private readonly MessageService $messageService,
+        private readonly MessageService $service,
         array $config = []
     )
     {
         parent::__construct($id, $module, $config);
     }
 
-    /**
-     * @return array
-     */
-    public function behaviors(): array
-    {
-        return array_merge(parent::behaviors(), [
-            'contentNegotiator' => [
-                'class'   => ContentNegotiator::class,
-                'formats' => [
-                    'application/json' => Response::FORMAT_JSON,
-                ],
-            ],
-        ]);
-    }
 
     /**
-     * Отправка сообщения и получение информативного результата
+     * Метод для отправки сообщения и получение информативного результата
      *
      * Route: POST /api/v1/messages
      *
@@ -64,32 +54,53 @@ class MessageController extends BaseRestController
         $form = new MessageForm();
         $form->load(Yii::$app->request->post(), '');
 
-        if (!$form->validate()) {
-            Yii::warning("Validation failed: " . json_encode($form->errors));
-            return $this->getResult($form);
-        }
-
         try {
-            $message = $this->messageService->process($form);
-            return $this->getResult($form, $message);
+            return $this->make($form);
         } catch (Throwable $e) {
-            Yii::error("Error processing adding message: " . $e->getMessage());
-            throw new BadRequestHttpException('Internal error');
+            Yii::error("Ошибка при добавлении сообщения: {$e->getMessage()}");
+            throw new BadRequestHttpException('Возникла внутренняя ошибка.');
         }
     }
 
     /**
      * @param MessageForm $form
+     *
+     * @return array
+     *
+     * @throws Throwable
+     * @throws Exception
+     */
+    private function make(MessageForm $form): array
+    {
+        if (!$form->validate()) {
+            Yii::warning('Ошибка валидации формы: ' . Json::encode($form->errors));
+            return $this->showResult($form);
+        }
+
+        return $this->showResult($form, $this->service->process($form));
+    }
+
+    /**
+     * Информативный ответ-результат
+     *
+     * @param MessageForm $form
      * @param null|Message $message
      *
      * @return array
      */
-    private function getResult(MessageForm $form, null|Message $message = null): array
+    private function showResult(MessageForm $form, null|Message $message = null): array
     {
-        return [
-            'success' => $message !== null,
-            'data'    => $message,
-            'errors'  => $message === null ? $form->errors : [],
-        ];
+        return match (true) {
+            $message === null => [
+                'success' => false,
+                'data'    => null,
+                'errors'  => $form->errors,
+            ],
+            default => [
+                'success' => true,
+                'data'    => $message,
+                'errors'  => [],
+            ],
+        };
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace api\controllers;
+namespace src\controllers;
 
 class HelloController extends BaseRestController
 {

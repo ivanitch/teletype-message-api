@@ -2,26 +2,27 @@
 
 declare(strict_types=1);
 
-namespace api\models;
+namespace src\models;
 
+use src\interfaces\MessageFactoryInterface;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
  * Сообщение
  *
- * @property integer $id ID записи
- * @property integer $dialog_id ID диалога
- * @property string $external_client_id Уникальный идентификатор клиента
- * @property string $external_message_Id Уникальный идентификатор сообщения
- * @property string $message_text Текст сообщения
- * @property integer $send_at Дата-время отправки в формате `unixtime`
- * @property integer $created_at Дата-время создания сообщения
+ * @property integer $id                 ID записи в таблице
+ * @property integer $dialog_id          ID диалога
+ * @property string $external_client_id  Уникальный идентификатор клиента
+ * @property string $external_message_id Уникальный идентификатор сообщения
+ * @property string $message_text        Текст сообщения
+ * @property integer $send_at            Дата-время отправки в формате `unixtime`
+ * @property integer $created_at         Дата-время создания сообщения
  *
  * @property-read Dialog $dialog Связь с диалогом клиента
  * @property-read Client $client Связь с клиентом
  */
-class Message extends ActiveRecord
+class Message extends ActiveRecord implements MessageFactoryInterface
 {
     public static function tableName(): string
     {
@@ -35,7 +36,6 @@ class Message extends ActiveRecord
             [['external_client_id', 'external_message_id'], 'string', 'length' => 32],
             ['message_text', 'string', 'max' => 4096],
             [['dialog_id', 'send_at'], 'integer'],
-            // Составной индекс: external_client_id + external_message_id
             [
                 ['dialog_id', 'external_client_id', 'external_message_id'],
                 'unique',
@@ -64,25 +64,27 @@ class Message extends ActiveRecord
     }
 
     /**
-     * Проверяет, существует ли сообщение с таким `external_client_id` и `external_message_id`.
+     * Создаёт новое Сообщение
      *
-     * @param string $clientID
-     * @param string $messageID
+     * @param array $params
      *
-     * @return bool
+     * @return MessageFactoryInterface
      */
-    public static function isDuplicate(string $clientID, string $messageID): bool
+    public static function create(array $params): MessageFactoryInterface
     {
-        return self::find()
-            ->where([
-                'external_client_id'  => $clientID,
-                'external_message_id' => $messageID,
-            ])
-            ->exists();
+        $message = new static();
+
+        $message->external_client_id  = $params['external_client_id'];
+        $message->dialog_id           = $params['dialog_id'];
+        $message->external_message_id = $params['external_message_id'];
+        $message->message_text        = $params['message_text'];
+        $message->send_at             = $params['send_at'];
+
+        return $message;
     }
 
     /**
-     * Связь с диалогом для этого сообщения
+     * Связь с Диалогом для этого Сообщения
      *
      * @return ActiveQuery
      */
@@ -92,7 +94,7 @@ class Message extends ActiveRecord
     }
 
     /**
-     * Связь с клиентом для этого сообщения
+     * Связь с Клиентом для этого Сообщения
      *
      * @return ActiveQuery
      */

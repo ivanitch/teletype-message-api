@@ -2,26 +2,23 @@
 
 declare(strict_types=1);
 
-namespace api\models;
+namespace src\models;
 
-use Yii;
-use yii\db\ActiveQuery;
-use yii\db\ActiveRecord;
-use yii\db\Exception;
-use yii\db\Expression;
+use src\interfaces\MessageFactoryInterface;
+use yii\db\{ActiveQuery, ActiveRecord};
 
 /**
  * Диалог
  *
- * @property integer $id ID записи
- * @property integer $client_id ID клиента внутри системы
+ * @property integer $id         ID записи в таблице
+ * @property integer $client_id  ID клиента внутри системы
  * @property integer $created_at Дата и время создания диалога
  * @property integer $updated_at Дата и время обновления диалога
  *
- * @property-read Client $client Связь с клиентом
+ * @property-read Client $client   Связь с клиентом
  * @property-read Message $message Связь с сообщением клиента
  */
-class Dialog extends ActiveRecord
+class Dialog extends ActiveRecord implements MessageFactoryInterface
 {
     public static function tableName(): string
     {
@@ -45,17 +42,19 @@ class Dialog extends ActiveRecord
     }
 
     /**
-     * Триггерим обновление `updated_at` через "пустой" UPDATE в диалоге ТОЛЬКО при новом сообщении
+     * Создаёт новый диалог
      *
-     * @return void
+     * @param array $params
      *
-     * @throws Exception
+     * @return MessageFactoryInterface
      */
-    public function touch(): void
+    public static function create(array $params): MessageFactoryInterface
     {
-        Yii::$app->db->createCommand()
-            ->update(static::tableName(), ['updated_at' => new Expression('updated_at')], ['id' => $this->id])
-            ->execute();
+        $dialog = new static();
+
+        $dialog->client_id = $params['client_id'];
+
+        return $dialog;
     }
 
     /**

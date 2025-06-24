@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace api\controllers;
+namespace src\controllers;
 
-use api\services\TeletypeAPIService;
+use src\services\TeletypeAPIService;
 use Throwable;
 use Yii;
 use yii\web\BadRequestHttpException;

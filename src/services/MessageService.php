@@ -2,21 +2,29 @@
 
 declare(strict_types=1);
 
-namespace api\services;
+namespace src\services;
 
-use api\forms\MessageForm;
-use api\models\Client;
-use api\models\Dialog;
-use api\models\Message;
+use src\forms\MessageForm;
+use src\interfaces\MessageFactoryInterface;
+use src\models\{Client, Dialog, Message};
+use src\repositories\{ClientRepository, DialogRepository, MessageRepository};
 use Throwable;
 use Yii;
 use yii\db\Exception;
 
 /**
- * Сервис обработки входящих сообщений из внешнего мессенджера.
+ * Сервис обработки входящих сообщений из внешних мессенджеров.
  */
-class MessageService
+readonly class MessageService
 {
+    public function __construct(
+        private ClientRepository  $clientsRepository,
+        private DialogRepository  $dialogsRepository,
+        private MessageRepository $messagesRepository
+    )
+    {
+    }
+
     /**
      * Ключевой метод сервиса, обрабатывает входящее сообщение.
      *
@@ -32,29 +40,22 @@ class MessageService
      * @throws Throwable
      * @throws Exception
      */
-    public function process(MessageForm $form): null|Message
+    public function process(MessageForm $form): null|MessageFactoryInterface
     {
-
         $transaction = Yii::$app->db->beginTransaction();
 
         try {
-            // Получаем или создаём клиента
+            // Получаем или сохраняем Клиента
             $client = $this->getOrCreateClient($form);
 
-            // Получаем или создаём диалог
+            // Получаем или сохраняем Диалог
             $dialog = $this->getOrCreateDialog($client);
 
-            // Проверяем сообщение на уникальность, следим за дубликатами
-            if (Message::isDuplicate($client->external_client_id, $form->external_message_id,)) {
-                $info = "Дубликат сообщения: external_message_id=$form->external_message_id,
-                         external_client_id=$client->external_client_id";
-                Yii::info($info);
-                $transaction->rollBack();
+            // Сохраняем новое Сообщение если это НЕ дубликат
+            $message = $this->getOrCreateMessage($client, $dialog, $form);
+            if (!$message) {
                 return null;
             }
-
-            // Создаём сообщение
-            $message = $this->createMessage($dialog, $client, $form);
 
             $transaction->commit();
 
@@ -66,35 +67,26 @@ class MessageService
         }
     }
 
+
     /**
-     * Получает существующего клиента или создаёт нового.
+     * Возвращает Клиента или сохраняет нового
      *
      * @param MessageForm $form
+     *
      * @return Client
+     *
      * @throws Exception
      */
-    private function getOrCreateClient(MessageForm $form): Client
+    private function getOrCreateClient(MessageForm $form): MessageFactoryInterface
     {
-
-        $client = Client::findOne(['external_client_id' => $form->external_client_id]);
-        if ($client !== null) {
-            return $client;
-        }
-
-        $client = new Client([
+        return $this->clientsRepository->make([
             'external_client_id' => $form->external_client_id,
             'client_phone'       => $form->client_phone,
         ]);
-
-        if (!$client->save()) {
-            throw new Exception('Ошибка при сохранении клиента: ' . json_encode($client->errors));
-        }
-
-        return $client;
     }
 
     /**
-     * Возвращает диалог клиента или создаёт новый.
+     * Возвращает Диалог Клиента или создаёт новый.
      *
      * @param Client $client
      *
@@ -102,46 +94,40 @@ class MessageService
      *
      * @throws Exception
      */
-    private function getOrCreateDialog(Client $client): Dialog
+    private function getOrCreateDialog(MessageFactoryInterface $client): MessageFactoryInterface
     {
-        if ($client->dialog) {
-            return $client->dialog;
-        }
-
-        $dialog = new Dialog(['client_id' => $client->id]);
-        if (!$dialog->save()) {
-            throw new Exception('Ошибка при создании диалога: ' . json_encode($dialog->errors));
-        }
-
-        return $dialog;
+        return $this->dialogsRepository->make([
+            'client_id' => $client->id
+        ]);
     }
 
     /**
-     * Создаёт новое сообщение в диалоге.
+     * Возвращает Сообщение Клиента в Диалоге (если оно уже есть) или сохраняет новое Сообщение
      *
-     * @param Dialog $dialog
      * @param Client $client
+     * @param Dialog $dialog
      * @param MessageForm $form
-     * @return Message
+     *
+     * @return MessageFactoryInterface|null
+     *
      * @throws Exception
      */
-    private function createMessage(Dialog $dialog, Client $client, MessageForm $form): Message
+    private function getOrCreateMessage(
+        Client      $client,
+        Dialog      $dialog,
+        MessageForm $form
+    ): null|MessageFactoryInterface
     {
-        $message = new Message([
-            'dialog_id'           => $dialog->id,
+        if ($this->messagesRepository->exists($client, $form->external_message_id)) {
+            return null;
+        }
+
+        return $this->messagesRepository->make([
             'external_client_id'  => $client->external_client_id,
+            'dialog_id'           => $dialog->id,
             'external_message_id' => $form->external_message_id,
             'message_text'        => $form->message_text,
             'send_at'             => $form->send_at,
         ]);
-
-        if (!$message->save()) {
-            throw new Exception('Ошибка при сохранении сообщения: ' . json_encode($message->errors));
-        }
-
-        // Триггер для обновления диалога
-        $dialog->touch();
-
-        return $message;
     }
 }

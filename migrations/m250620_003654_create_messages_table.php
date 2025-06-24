@@ -49,16 +49,6 @@ class m250620_003654_create_messages_table extends Migration
             'CASCADE'
         );
 
-        $this->addForeignKey(
-            'fk-messages-external_client_id',
-            self::MESSAGES_TABLE,
-            'external_client_id',
-            '{{%clients}}',
-            'external_client_id',
-            'CASCADE',
-            'CASCADE'
-        );
-
         $this->addCommentOnTable(self::MESSAGES_TABLE, 'Сообщения');
     }
 

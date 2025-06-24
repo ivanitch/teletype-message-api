@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace api\services;
+namespace src\services;
 
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -11,6 +11,8 @@ use yii\httpclient\Exception;
 use yii\web\HttpException;
 
 /**
+ * Тест для Себя ☝️
+ *
  * @see: API DOC -> https://api.teletype.app/public/api/v1/
  */
 class TeletypeAPIService extends Component

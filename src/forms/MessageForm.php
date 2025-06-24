@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace api\forms;
+namespace src\forms;
 
-use api\models\Message;
+use src\validators\MessageDuplicateValidator;
+use src\validators\PhoneValidator;
 use yii\base\Model;
 
 /**
@@ -26,47 +27,28 @@ class MessageForm extends Model
     {
         return [
             [
-                ['external_client_id', 'external_message_id', 'client_phone', 'message_text', 'send_at'],
+                [
+                    'external_client_id',
+                    'external_message_id',
+                    'client_phone',
+                    'message_text',
+                    'send_at'
+                ],
                 'required'
             ],
+            ['send_at', 'integer'],
+            ['message_text', 'string', 'max' => 4096],
             [
                 ['external_message_id', 'external_client_id'],
                 'string',
                 'length' => 32
             ],
-            ['client_phone', 'match', 'pattern' => '/^\+7\d{10}$/'],
-            ['message_text', 'string', 'max' => 4096],
-            ['send_at', 'integer'],
-            ['external_message_id', 'validateMessageDuplicate'],
+            ['client_phone', PhoneValidator::class],
+            [
+                'external_message_id',
+                MessageDuplicateValidator::class,
+                'clientIdAttribute' => 'external_client_id',
+            ],
         ];
-    }
-
-    /**
-     * Валидаторр
-     * Проверяет, что для комбинации
-     * (`external_client_id` + `external_message_id`) нет уже сохранённого сообщения.
-     *
-     * @return bool
-     */
-    public function validateMessageDuplicate(): bool
-    {
-        if ($this->hasErrors() || $this->messageExists()) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Проверяет, что для комбинации `external_client_id` + `external_message_id` нет уже сохранённого сообщения.
-     *
-     * @return bool
-     *
-     */
-    private function messageExists(): bool
-    {
-        return Message::isDuplicate(
-            $this->external_client_id, $this->external_message_id
-        );
     }
 }
