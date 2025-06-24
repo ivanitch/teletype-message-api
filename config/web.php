@@ -2,6 +2,7 @@
 
 use yii\caching\FileCache;
 use yii\log\FileTarget;
+use yii\redis\Connection;
 use yii\web\JsonParser;
 
 $params     = require __DIR__ . '/params.php';
@@ -48,6 +49,12 @@ $config = [
         ],
         'db'         => $db,
         'urlManager' => $urlManager,
+        'redis' => [
+            'class' => Connection::class,
+            'hostname' => 'teletype_redis',
+            'port' => 6379,
+            'database' => 0,
+        ],
     ],
     'params'              => $params,
 ];

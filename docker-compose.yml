@@ -27,6 +27,7 @@ services:
       - .:/var/www/html
     depends_on:
       - database
+      - redis
     networks:
       - app-network
 
@@ -44,6 +45,17 @@ services:
       - .:/var/www/html
     networks:
       - app-network
+
+  redis:
+    container_name: ${APP_NAME}_redis
+    image: redis:${REDIS_VERSION}
+    ports:
+      - 6379:6379
+    volumes:
+      - ./.docker/redis-data:/data
+    networks:
+      - app-network
+    restart: unless-stopped
 
 volumes:
   pgdata:

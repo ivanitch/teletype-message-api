@@ -13,6 +13,8 @@ return [
     'rules'               => [
         ''                      => 'hello/index',
 
+        'test'                  => 'hello/test',
+
         // Добавление сообщений в http://neo-teletype.app (local)
         'POST api/v1/messages'  => 'v1/message/create',
 

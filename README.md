@@ -6,6 +6,7 @@
 ![Nginx](https://img.shields.io/badge/Nginx-1.27-009639?logo=nginx&logoColor=white)
 ![PHP-FPM](https://img.shields.io/badge/PHP_FPM-8.4-777BB4?logo=php&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17.5-4169E1?logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-8.0-DC382D?logo=redis&logoColor=white)
 
 ## Установка проекта ✨
 ```bash
@@ -35,5 +36,6 @@ Hello world! 👋 | Yii version 2.0.52
 ```
 
 ## Дополнительно 🔗
-- [Описание задачи](Task.md)
-- [Решение задачи](Solution.md)
+- [Описание задачи](resurces/Task.md)
+- [Примитивное решение задачи](resurces/Solution.md)
+- [Продвинутое решение](resurces/Advanced.md)

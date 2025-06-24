@@ -2,3 +2,4 @@
 /vendor/
 /.docker/log/
 /.docker/pgdata/
+/.docker/redis-data/
