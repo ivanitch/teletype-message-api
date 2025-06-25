@@ -8,7 +8,7 @@ use InvalidArgumentException;
 use RuntimeException;
 use src\interfaces\MessageFactoryInterface;
 use src\models\Dialog;
-use src\services\RedisLockService;
+use src\services\RedisService;
 
 class DialogRepository extends AbstractRepository
 {
@@ -36,14 +36,18 @@ class DialogRepository extends AbstractRepository
     public function make(array $params): MessageFactoryInterface
     {
         $clientId = $params['client_id'] ?? null;
+
         if (!$clientId) {
             throw new InvalidArgumentException('Не передан client_id');
         }
 
-        $lockKey = "dialog_lock:client_$clientId";
+        $key = "dialog_lock:client_$clientId";
+        $ttl = 3;
 
-        if (!RedisLockService::set($lockKey)) {
-            throw new RuntimeException("Диалог с клиентом #$clientId обрабатывается другим процессом");
+        $lockAcquired = RedisService::set($key, 1, $ttl);
+
+        if (!$lockAcquired) {
+            throw new RuntimeException("Диалог с клиентом #$clientId уже обрабатывается (lock)");
         }
 
         try {
@@ -55,7 +59,8 @@ class DialogRepository extends AbstractRepository
 
             return $dialog;
         } finally {
-            RedisLockService::destroy($lockKey);
+            RedisService::destroy($key);
         }
     }
+
 }

@@ -88,11 +88,9 @@ readonly class MessageService
     /**
      * Возвращает Диалог Клиента или создаёт новый.
      *
-     * @param Client $client
+     * @param MessageFactoryInterface $client
      *
-     * @return Dialog
-     *
-     * @throws Exception
+     * @return Client
      */
     private function getOrCreateDialog(MessageFactoryInterface $client): MessageFactoryInterface
     {

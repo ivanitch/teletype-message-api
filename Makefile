@@ -27,3 +27,6 @@ logs:
 
 app:
 	@docker exec -it ${APP_NAME}_php-fpm /bin/bash
+
+redis:
+	@docker exec -it ${APP_NAME}_redis redis-cli
