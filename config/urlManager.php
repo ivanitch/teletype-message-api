@@ -12,8 +12,7 @@ return [
     'showScriptName'      => false,
     'rules'               => [
         ''                      => 'hello/index',
-
-        'test'                  => 'hello/test',
+        'ping'                  => 'ping/index',
 
         // Добавление сообщений в http://neo-teletype.app (local)
         'POST api/v1/messages'  => 'v1/message/create',

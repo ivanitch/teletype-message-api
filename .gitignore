@@ -3,3 +3,4 @@
 /.docker/log/
 /.docker/pgdata/
 /.docker/redis-data/
+/src/controllers/PingController.php

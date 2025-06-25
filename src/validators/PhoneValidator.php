@@ -8,7 +8,7 @@ class PhoneValidator extends Validator
 {
     public string $pattern = '/^\+7\d{10}$/';
 
-    public $message = 'Номер телефона должен быть в формате `+7XXXXXXXXXX` и состоять из 12-ти символов';
+    public $message = 'Номер телефона должен быть в формате `+7XXXXXXXXXX` и состоять из 11-ти цифр';
 
     public function validateAttribute($model, $attribute): void
     {
