@@ -4,3 +4,4 @@
 /.docker/pgdata/
 /.docker/redis-data/
 /src/controllers/PingController.php
+/.loadtester/loadtester.log
