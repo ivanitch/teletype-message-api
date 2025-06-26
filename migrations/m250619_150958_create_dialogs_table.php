@@ -30,9 +30,10 @@ class m250619_150958_create_dialogs_table extends Migration
         $this->createFunctionAndTriggerForUpdatedAtColumn();
 
         $this->createIndex(
-            'idx-dialogs-client_id',
+            'uniq-dialog-client',
             self::DIALOGS_TABLE,
-            'client_id'
+            'client_id',
+            true
         );
 
         $this->addForeignKey(

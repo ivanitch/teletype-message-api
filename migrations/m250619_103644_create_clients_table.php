@@ -21,7 +21,7 @@ class m250619_103644_create_clients_table extends Migration
         ]);
 
         $this->createIndex(
-            'idx-unique-client',
+            'unique-client',
             self::CLIENTS_TABLE,
             ['external_client_id', 'client_phone'],
             true

@@ -33,7 +33,7 @@ class m250620_003654_create_messages_table extends Migration
         ]);
 
         $this->createIndex(
-            'idx-unique-client-dialog-message',
+            'unique-client-dialog-message',
             self::MESSAGES_TABLE,
             ['dialog_id', 'external_client_id', 'external_message_id'],
             true

@@ -9,6 +9,7 @@ use RuntimeException;
 use src\interfaces\MessageFactoryInterface;
 use src\models\Dialog;
 use src\services\RedisService;
+use yii\redis\Mutex;
 
 class DialogRepository extends AbstractRepository
 {
@@ -24,10 +25,9 @@ class DialogRepository extends AbstractRepository
         return Dialog::findOne($params);
     }
 
-
     /**
      * Возвращает существующий Диалог или Сохраняет новый Диалог
-     * Используем Redis для решения проблемы "Гонка за диалог"
+     * Решение проблемы гонки за диалог с помощью Redis Mutex
      *
      * @param array $params
      *
@@ -41,26 +41,28 @@ class DialogRepository extends AbstractRepository
             throw new InvalidArgumentException('Не передан client_id');
         }
 
-        $key = "dialog_lock:client_$clientId";
-        $ttl = 3;
+        $mutex = new Mutex(new RedisService());
+        $lockKey = "dialog_lock:client_$clientId";
+        $lockTimeout = 3;
 
-        $lockAcquired = RedisService::set($key, 1, $ttl);
-
-        if (!$lockAcquired) {
+        if (!$mutex->acquire($lockKey, $lockTimeout)) {
             throw new RuntimeException("Диалог с клиентом #$clientId уже обрабатывается (lock)");
         }
 
         try {
-            $dialog = $this->find($params) ?? Dialog::create($params);
+            $dialog = $this->find($params);
 
-            if ($dialog->isNewRecord) {
-                $this->save($dialog, 'диалога');
+            if ($dialog === null) {
+                $dialog = Dialog::create($params);
+
+                if ($dialog->isNewRecord) {
+                    $this->save($dialog, 'диалога');
+                }
             }
 
             return $dialog;
         } finally {
-            RedisService::destroy($key);
+            $mutex->release($lockKey);
         }
     }
-
 }

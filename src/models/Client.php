@@ -43,6 +43,7 @@ class Client extends ActiveRecord implements MessageFactoryInterface
     public static function create(array $params): MessageFactoryInterface
     {
         $client                     = new static();
+
         $client->external_client_id = $params['external_client_id'];
         $client->client_phone       = $params['client_phone'];
 
