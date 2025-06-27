@@ -8,6 +8,6 @@ class HelloController extends BaseRestController
 {
     public function actionIndex(): string
     {
-        return 'Hello world! 👋 | Yii version ' . \Yii::getVersion();
+        return 'Hello, world! 👋 | Yii version ' . \Yii::getVersion();
     }
 }

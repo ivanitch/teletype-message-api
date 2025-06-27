@@ -68,7 +68,7 @@ client_phone='+70000000000'
 
 Запуск скрипта:
 ```bash
-docker exec -it $(APP_NAME)_loadtester php /app/test.php
+docker exec -it teletype_loadtester php /app/test.php
 
 # или
 make tester
