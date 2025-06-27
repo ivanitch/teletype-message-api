@@ -27,6 +27,8 @@ composer install
 ```
 
 ## Postman
+> Указать хост `127.0.0.1  neo-teletype.app` в файле `/etc/hosts`
+
 ```
 GET https://neo-teletype.app/
 ```

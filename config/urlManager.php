@@ -18,9 +18,9 @@ return [
         'POST api/v1/messages'  => 'v1/message/create',
 
         // Получение данных от https://api.teletype.app (remote)
-        'teletype-api/clients'  => 'notification/clients',
-        'teletype-api/channels' => 'notification/channels',
-        'teletype-api/dialogs'  => 'notification/dialogs',
-        'teletype-api/messages' => 'notification/messages',
+        //'teletype-api/clients'  => 'notification/clients',
+        //'teletype-api/channels' => 'notification/channels',
+        //'teletype-api/dialogs'  => 'notification/dialogs',
+        //'teletype-api/messages' => 'notification/messages',
     ]
 ];

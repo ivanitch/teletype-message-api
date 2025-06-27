@@ -55,7 +55,7 @@ class MessageController extends BaseRestController
         $form->load(Yii::$app->request->post(), '');
 
         try {
-            Yii::info('REQUEST: ' . json_encode(Yii::$app->request->bodyParams), 'loadtester');
+            //Yii::info('REQUEST: ' . Json::encode(Yii::$app->request->bodyParams), 'loadtester');
             return $this->make($form);
         } catch (Throwable $e) {
             Yii::error("Ошибка при добавлении сообщения: {$e->getMessage()}");
