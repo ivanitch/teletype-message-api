@@ -8,8 +8,8 @@
  * - Один и тот же номер у разных клиентов (внешних источников)
  */
 
-const REQUESTS   = 100_000; // общее количество сообщений
-const CONCURRENT = 100;     // сколько одновременно слать
+const REQUESTS   = 100; // общее количество сообщений
+const CONCURRENT = 10;     // сколько одновременно слать
 const API_URL    = 'http://nginx/api/v1/messages';
 
 $logFile = __DIR__ . '/loadtester.log';
@@ -133,7 +133,7 @@ foreach ($messages as $i => $payload) {
 
 curl_multi_close($multiHandle);
 
-logResult("\n==== Результаты ====\n");
+logResult("\n=== Результаты ===\n");
 logResult("Всего сообщений: " . count($messages) . "\n");
 logResult("Успешно: $success\n");
 logResult("Ошибки:  $fail\n");

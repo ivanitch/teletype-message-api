@@ -1,11 +1,11 @@
 services:
-
+  # Nginx
   nginx:
     container_name: ${APP_NAME}_nginx
     image: nginx:${NGINX_VERSION}
     ports:
       - 80:80
-      - 443:443
+      #- 443:443
     volumes:
       - ./.docker/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
       - ./.docker/log/nginx:/var/log/nginx
@@ -15,7 +15,7 @@ services:
       - database
     networks:
       - app-network
-
+  # PHP-FPM
   php-fpm:
     container_name: ${APP_NAME}_php-fpm
     ports:
@@ -30,7 +30,7 @@ services:
       - redis
     networks:
       - app-network
-
+  # PostgreSQL
   database:
     container_name: ${APP_NAME}_database
     image: postgres:${POSTGRES_VERSION}
@@ -45,7 +45,7 @@ services:
       - .:/var/www/html
     networks:
       - app-network
-
+  # Redis
   redis:
     container_name: ${APP_NAME}_redis
     image: redis:${REDIS_VERSION}
@@ -56,18 +56,17 @@ services:
     networks:
       - app-network
     restart: unless-stopped
-
+  # PHP-CLI (Исскуственное нагрузочное тестирование)
   loadtester:
     container_name: ${APP_NAME}_loadtester
-    image: php:${LOADTESTER_PHP_VERSION}
+    build:
+      context: ./.docker/php-cli
     volumes:
-      - ./.loadtester:/app
-    working_dir: /app
+      - ./.loadtester:/app #:rw,uid=1000,gid=1000  # Явное указание прав
     depends_on:
       - php-fpm
     networks:
       - app-network
-    entrypoint: [ "sleep", "infinity" ]
 
 volumes:
   pgdata:
