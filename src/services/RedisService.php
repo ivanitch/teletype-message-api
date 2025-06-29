@@ -5,18 +5,12 @@ declare(strict_types=1);
 namespace src\services;
 
 use Yii;
+use yii\db\Exception;
 use yii\redis\Connection;
 
 class RedisService
 {
     private static ?Connection $connection = null;
-
-    public function __construct()
-    {
-        if (self::$connection === null) {
-            self::$connection = Yii::$app->redis;
-        }
-    }
 
     /**
      * Устанавливает ключ, если он ещё не установлен (атомарная блокировка)
@@ -32,6 +26,32 @@ class RedisService
         // NX — установить только если ключ не существует
         // EX — время жизни в секундах
         return self::getConnection()->set($key, $value, 'NX', 'EX', $ttl) === true;
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return bool
+     *
+     * @throws Exception
+     */
+    public static function exists(string $key): bool
+    {
+        return (bool)self::getConnection()->executeCommand('EXISTS', [$key]);
+    }
+
+    /**
+     * @param string $key
+     * @param int $ttl
+     * @param $value
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
+    public static function setex(string $key, int $ttl, $value): void
+    {
+        self::getConnection()->executeCommand('SETEX', [$key, $ttl, $value]);
     }
 
     /**
@@ -57,7 +77,7 @@ class RedisService
     /**
      * @return Connection
      */
-    protected static function getConnection(): Connection
+    public static function getConnection(): Connection
     {
         if (self::$connection === null) {
             self::$connection = Yii::$app->redis;

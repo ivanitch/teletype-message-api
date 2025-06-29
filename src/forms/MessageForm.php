@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace src\forms;
 
-use src\validators\MessageDuplicateValidator;
-use src\validators\PhoneValidator;
+use src\validators\{MessageDuplicateValidator, PhoneValidator, UniqueClientValidator};
 use yii\base\Model;
 
 /**
- * @property string $external_client_id Уникальный идентификатор клиента
+ * @property string $external_client_id  Уникальный идентификатор клиента
  * @property string $external_message_id Уникальный идентификатор сообщения
- * @property string $client_phone Уникальный номер телефона клиента
- * @property string $message_text Текст сообщения
- * @property integer $send_at Дата-время отправки сообщения
+ * @property string $client_phone        Уникальный номер телефона клиента
+ * @property string $message_text        Текст сообщения
+ * @property integer $send_at            Дата-время отправки сообщения
  */
 class MessageForm extends Model
 {
@@ -39,7 +38,7 @@ class MessageForm extends Model
             ['send_at', 'integer'],
             ['message_text', 'string', 'max' => 4096],
             [
-                ['external_message_id', 'external_client_id'],
+                ['external_client_id', 'external_message_id'],
                 'string',
                 'length' => 32
             ],

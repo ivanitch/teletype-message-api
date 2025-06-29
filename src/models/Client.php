@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace src\models;
 
-use src\interfaces\MessageFactoryInterface;
+use src\validators\PhoneValidator;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -17,7 +17,7 @@ use yii\db\ActiveRecord;
  *
  * @property-read Dialog $dialog        Связь с Диалогом Клиента
  */
-class Client extends ActiveRecord implements MessageFactoryInterface
+class Client extends ActiveRecord
 {
     public static function tableName(): string
     {
@@ -29,7 +29,7 @@ class Client extends ActiveRecord implements MessageFactoryInterface
         return [
             [['external_client_id', 'client_phone'], 'required'],
             ['external_client_id', 'string', 'length' => 32],
-            [['external_client_id', 'client_phone'], 'unique'],
+            ['client_phone', PhoneValidator::class],
         ];
     }
 
@@ -38,11 +38,11 @@ class Client extends ActiveRecord implements MessageFactoryInterface
      *
      * @param array $params
      *
-     * @return MessageFactoryInterface
+     * @return Client
      */
-    public static function create(array $params): MessageFactoryInterface
+    public static function create(array $params): Client
     {
-        $client                     = new static();
+        $client = new static();
 
         $client->external_client_id = $params['external_client_id'];
         $client->client_phone       = $params['client_phone'];

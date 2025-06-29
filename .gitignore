@@ -3,5 +3,5 @@
 /.docker/log/
 /.docker/pgdata/
 /.docker/redis-data/
+/.loadtester/logs/loadtester.log
 /src/controllers/PingController.php
-/.loadtester/loadtester.log

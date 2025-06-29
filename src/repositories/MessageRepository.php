@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace src\repositories;
 
-use src\interfaces\MessageFactoryInterface;
-use src\models\{Client, Dialog, Message};
+
+use src\models\{Dialog, Message};
 use Yii;
 use yii\db\{Exception, Expression};
 
 class MessageRepository extends AbstractRepository
 {
-    private const string IS_DUPLICATED_MESSAGE = 'Дубликат сообщения: %1$s, клиента: %2$s';
-
-
     /**
      * Поиск Сообщения по (`external_client_id` + `external_message_id`)
      *
@@ -21,7 +18,7 @@ class MessageRepository extends AbstractRepository
      *
      * @return Message|null
      */
-    public function find(array $params): MessageFactoryInterface|null
+    public function find(array $params): Message|null
     {
         return Message::findOne([
             'external_client_id'  => $params['external_client_id'],
@@ -31,30 +28,21 @@ class MessageRepository extends AbstractRepository
 
     /**
      * Проверка на наличие Сообщения Клиента (Дубликат)
-     * Дубликаты записываем в лог
+     *  Дубликаты записываем в лог
      *
-     * @param Client $client
+     * @param string $externalClientId
      * @param string $messageId
      *
      * @return bool
      */
-    public function exists(Client $client, string $messageId): bool
+    public function exists(string $externalClientId, string $messageId): bool
     {
         $exists = Message::find()
             ->where([
-                'external_client_id'  => $client->external_client_id,
+                'external_client_id'  => $externalClientId,
                 'external_message_id' => $messageId,
             ])
             ->exists();
-
-        if ($exists) {
-            Yii::info(sprintf(
-                static::IS_DUPLICATED_MESSAGE,
-                "external_message_id=$messageId",
-                "external_client_id=$client->external_client_id"
-            ));
-            return true;
-        }
 
         return false;
     }
@@ -64,13 +52,13 @@ class MessageRepository extends AbstractRepository
      *
      * @param array $params
      *
-     * @return MessageFactoryInterface
+     * @return Message
      *
      * @throws Exception
      */
-    public function make(array $params): MessageFactoryInterface
+    public function make(array $params): Message
     {
-        $message = $this->find($params) ?? Message::create($params);;
+        $message = $this->find($params) ?? Message::create($params);
 
         if ($message->isNewRecord) {
             $this->save($message, 'сообщения');

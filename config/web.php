@@ -1,8 +1,10 @@
 <?php
 
+use src\services\SafeMutexService;
 use yii\caching\FileCache;
 use yii\log\FileTarget;
 use yii\redis\Connection;
+use yii\redis\Mutex;
 use yii\web\JsonParser;
 
 $params     = require __DIR__ . '/params.php';
@@ -37,7 +39,7 @@ $config = [
                 [
                     'class'  => FileTarget::class,
                     'levels' => ['error', 'warning', 'info'],
-                    // Исключаем ненужные сообщения. На уровне `info` ловим только дубликаты сообщения
+                    // Исключаем ненужные сообщения. На уровне `info` записывваем дубликаты сообщения
                     'except' => [
                         'yii\filters\RateLimiter::beforeAction',
                         'yii\db\Connection::open',
@@ -49,12 +51,17 @@ $config = [
         ],
         'db'         => $db,
         'urlManager' => $urlManager,
-        'redis' => [
-            'class' => Connection::class,
+        'redis'      => [
+            'class'    => Connection::class,
             'hostname' => 'teletype_redis',
-            'port' => 6379,
+            'port'     => 6379,
             'database' => 0,
         ],
+        'safeMutex'  => function () {
+            $mutex        = Yii::createObject(Mutex::class);
+            $mutex->redis = Yii::$app->redis;
+            return new SafeMutexService($mutex);
+        },
     ],
     'params'              => $params,
 ];

@@ -6,10 +6,10 @@ namespace src\repositories;
 
 use InvalidArgumentException;
 use RuntimeException;
-use src\interfaces\MessageFactoryInterface;
 use src\models\Dialog;
 use src\services\RedisService;
 use yii\redis\Mutex;
+
 
 class DialogRepository extends AbstractRepository
 {
@@ -20,7 +20,7 @@ class DialogRepository extends AbstractRepository
      *
      * @return Dialog|null
      */
-    public function find(array $params): MessageFactoryInterface|null
+    public function find(array $params): Dialog|null
     {
         return Dialog::findOne($params);
     }
@@ -31,9 +31,9 @@ class DialogRepository extends AbstractRepository
      *
      * @param array $params
      *
-     * @return MessageFactoryInterface
+     * @return Dialog
      */
-    public function make(array $params): MessageFactoryInterface
+    public function make(array $params): Dialog
     {
         $clientId = $params['client_id'] ?? null;
 
@@ -41,7 +41,9 @@ class DialogRepository extends AbstractRepository
             throw new InvalidArgumentException('Не передан client_id');
         }
 
-        $mutex = new Mutex(new RedisService());
+        $mutex = new Mutex();
+        $mutex->redis = RedisService::getConnection();
+
         $lockKey = "dialog_lock:client_$clientId";
         $lockTimeout = 3;
 
@@ -54,10 +56,7 @@ class DialogRepository extends AbstractRepository
 
             if ($dialog === null) {
                 $dialog = Dialog::create($params);
-
-                if ($dialog->isNewRecord) {
-                    $this->save($dialog, 'диалога');
-                }
+                $this->save($dialog, 'диалога');
             }
 
             return $dialog;

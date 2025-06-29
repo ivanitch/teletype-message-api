@@ -55,7 +55,6 @@ class MessageController extends BaseRestController
         $form->load(Yii::$app->request->post(), '');
 
         try {
-            //Yii::info('REQUEST: ' . Json::encode(Yii::$app->request->bodyParams), 'loadtester');
             return $this->make($form);
         } catch (Throwable $e) {
             Yii::error("Ошибка при добавлении сообщения: {$e->getMessage()}");
@@ -75,27 +74,27 @@ class MessageController extends BaseRestController
     {
         if (!$form->validate()) {
             Yii::warning('Ошибка валидации формы: ' . Json::encode($form->errors));
-            return $this->showResult($form);
+            return $this->showResult($form->errors);
         }
 
-        return $this->showResult($form, $this->service->process($form));
+        return $this->showResult(message: $this->service->process($form));
     }
 
     /**
      * Информативный ответ-результат
      *
-     * @param MessageForm $form
-     * @param null|Message $message
+     * @param array $errors
+     * @param Message|null $message
      *
      * @return array
      */
-    private function showResult(MessageForm $form, null|Message $message = null): array
+    private function showResult(array $errors = [], Message|null $message = null): array
     {
         return match (true) {
             $message === null => [
                 'success' => false,
                 'data'    => null,
-                'errors'  => $form->errors,
+                'errors'  => $errors,
             ],
             default => [
                 'success' => true,

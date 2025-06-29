@@ -23,7 +23,7 @@ services:
     build:
       context: ./.docker/php-fpm
     volumes:
-      - ./.docker/php-fpm/conf.d/php.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./.docker/php-fpm/conf.d/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
       - .:/var/www/html
     depends_on:
       - database
@@ -62,7 +62,8 @@ services:
     build:
       context: ./.docker/php-cli
     volumes:
-      - ./.loadtester:/app #:rw,uid=1000,gid=1000  # Явное указание прав
+      - ./.loadtester:/app  #:rw,uid=1000,gid=1000  # Явное указание прав
+      - ./.docker/php-cli/conf.d/php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
     depends_on:
       - php-fpm
     networks:

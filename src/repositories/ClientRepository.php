@@ -4,12 +4,20 @@ declare(strict_types=1);
 
 namespace src\repositories;
 
-use src\interfaces\MessageFactoryInterface;
 use src\models\Client;
-use yii\db\Exception;
 
 class ClientRepository extends AbstractRepository
 {
+    /**
+     * @param array $params
+     *
+     * @return bool
+     */
+    public function exists(array $params): bool
+    {
+        return Client::find()->where($params)->exists();
+    }
+
     /**
      * Поиск Клиента по (`external_client_id` + `client_phone`)
      *
@@ -17,28 +25,28 @@ class ClientRepository extends AbstractRepository
      *
      * @return Client|null
      */
-    public function find(array $params): MessageFactoryInterface|null
+    public function findOne(array $params): Client|null
     {
         return Client::findOne($params);
     }
 
     /**
-     * Возвращает существующего Клиента или Сохраняет нового Клиента
+     * Возвращает существующего Клиента или сохраняет нового
      *
      * @param array $params
      *
      * @return Client
-     *
-     * @throws Exception
      */
-    public function make(array $params): MessageFactoryInterface
+    public function make(array $params): Client
     {
-        $client = $this->find($params) ?? Client::create($params);
+        $client = $this->findOne($params);
 
-        if ($client->isNewRecord) {
+        if (!$client) {
+            $client = Client::create($params);
             $this->save($client, 'клиента');
         }
 
         return $client;
     }
+
 }

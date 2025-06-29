@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace src\repositories;
 
 use RuntimeException;
-use src\interfaces\MessageFactoryInterface;
-use yii\db\{ActiveRecord, Exception};
+use yii\db\{ActiveRecord};
 use yii\helpers\Json;
 
 abstract class AbstractRepository
@@ -19,23 +18,15 @@ abstract class AbstractRepository
      *
      * @param array $params
      *
-     * @return MessageFactoryInterface
+     * @return ActiveRecord
      */
-    abstract public function make(array $params): MessageFactoryInterface;
+    abstract public function make(array $params): ActiveRecord;
 
     /**
-     * Проверяет модель на ошибки валидации и, в случае их отсутствия, сохраняет её
-     *
-     * @param MessageFactoryInterface $model
-     * @param string $entity
-     *
-     * @return void
-     *
-     * @throws Exception
+     * Проверяет модель на ошибки валидации и сохраняет
      */
-    protected function save(MessageFactoryInterface $model, string $entity): void
+    protected function save(ActiveRecord $model, string $entity): void
     {
-        /* @var ActiveRecord $model */
         if (!$model->validate()) {
             throw new RuntimeException(sprintf(self::ERROR_VALIDATE, $entity, Json::encode($model->errors)));
         }
@@ -45,3 +36,4 @@ abstract class AbstractRepository
         }
     }
 }
+

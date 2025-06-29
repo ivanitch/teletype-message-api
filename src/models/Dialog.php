@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace src\models;
 
-use src\interfaces\MessageFactoryInterface;
 use yii\db\{ActiveQuery, ActiveRecord};
 
 /**
@@ -18,7 +17,7 @@ use yii\db\{ActiveQuery, ActiveRecord};
  * @property-read Client $client   Связь с клиентом
  * @property-read Message $message Связь с сообщением клиента
  */
-class Dialog extends ActiveRecord implements MessageFactoryInterface
+class Dialog extends ActiveRecord
 {
     public static function tableName(): string
     {
@@ -46,9 +45,9 @@ class Dialog extends ActiveRecord implements MessageFactoryInterface
      *
      * @param array $params
      *
-     * @return MessageFactoryInterface
+     * @return Dialog
      */
-    public static function create(array $params): MessageFactoryInterface
+    public static function create(array $params): Dialog
     {
         $dialog = new static();
 
