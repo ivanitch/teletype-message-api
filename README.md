@@ -21,20 +21,24 @@ git clone git@github.com:ivanitch/teletype-message-api.git .
 make build && make up && make app
 ```
 
-## В Docker-контейнере установить зависимости
+## В Docker-контейнере установить зависимости 📦
 ```
 composer install
 ```
 
-## Postman
-> Указать хост `127.0.0.1  neo-teletype.app` в файле `/etc/hosts`
+Указать хост в файле `/etc/hosts`
+```bash
+echo "127.0.0.1 neo-teletype.app" | sudo tee -a /etc/hosts
+```
+
+## Postman ⚒️ 
 
 ```
 GET https://neo-teletype.app/
 ```
 Видим:
 ```
-Hello world! 👋 | Yii version 2.0.52
+Hello, world! 👋 | Yii version 2.0.53
 ```
 
 ## Дополнительно 🔗
