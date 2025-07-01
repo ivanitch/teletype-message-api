@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace src\models;
 
-use yii\db\{ActiveQuery, ActiveRecord};
+use yii\db\{ActiveQuery, ActiveRecord, Exception};
 
 /**
  * Диалог
@@ -54,6 +54,19 @@ class Dialog extends ActiveRecord
         $dialog->client_id = $params['client_id'];
 
         return $dialog;
+    }
+
+    /**
+     * Триггерим обновление `updated_at` Диалога ТОЛЬКО при новом Сообщении
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
+    public function touchUpdateAt(): void
+    {
+        $this->updated_at = time();
+        $this->save(false, ['updated_at']);
     }
 
     /**

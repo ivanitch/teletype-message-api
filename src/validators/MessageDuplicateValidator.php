@@ -43,10 +43,10 @@ class MessageDuplicateValidator extends Validator
             'client_phone'       => $clientPhone
         ])) return;
 
-        if ($this->messageRepository->exists(
-            $externalClientId,
-            $externalMessageId
-        )) {
+        if ($this->messageRepository->exists([
+            'external_client_id'  => $externalClientId,
+            'external_message_id' => $externalMessageId
+        ])) {
             $this->addError(
                 $model,
                 $attribute,

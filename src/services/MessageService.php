@@ -43,35 +43,34 @@ readonly class MessageService
      */
     public function process(MessageForm $form): Message|null
     {
-        $clientId = $form->external_client_id;
-        $messageId = $form->external_message_id;
+        $clientId      = $form->external_client_id;
+        $messageId     = $form->external_message_id;
         $idempotentKey = "idempotent:msg:$clientId:$messageId";
-        $mutexKey = "mutex:msg:$clientId";
+        $mutexKey      = "lock:client:$clientId";
+
+        if (!$this->redis->setIfNotExists($idempotentKey, 1, 3600)) {
+            Yii::info("Дубликат! Клиент: $clientId, Сообщение: $messageId, Redis key: $idempotentKey");
+            return null;
+        }
 
         return $this->mutex->run($mutexKey, function () use ($form, $idempotentKey, $clientId, $messageId) {
-            if ($this->redis->exists($idempotentKey)) {
-                $log = "Дубликат! Клиент: $clientId, Сообщение: $messageId, Idempotent key Redis: $idempotentKey";
-                Yii::info($log);
-                return null;
-            }
-
             $transaction = Yii::$app->db->beginTransaction();
 
             try {
-                $client = $this->getOrCreateClient($form);
-                $dialog = $this->getOrCreateDialog($client);
+                $client  = $this->getOrCreateClient($form);
+                $dialog  = $this->getOrCreateDialog($client);
                 $message = $this->getOrCreateMessage($client, $dialog, $form);
 
                 if (!$message) {
                     return null;
                 }
 
-                $this->redis->setex($idempotentKey, 3600, 1); // TTL 1 час, можно настроить
-
                 $transaction->commit();
+
                 return $message;
             } catch (Throwable $e) {
                 $transaction->rollBack();
+                $this->redis->delete($idempotentKey); // Откат идемпотентного ключа
                 Yii::error("Ошибка при обработке сообщения: {$e->getMessage()}", __METHOD__);
                 throw new Exception('Ошибка обработки сообщения', 0, $e);
             }
@@ -125,10 +124,15 @@ readonly class MessageService
         MessageForm $form
     ): Message|null
     {
-        $clientId = $client->external_client_id;
+        $clientId  = $client->external_client_id;
         $messageId = $form->external_message_id;
 
-        if ($this->messages->exists($clientId, $messageId)) {
+        $params = [
+            'external_client_id'  => $clientId,
+            'external_message_id' => $messageId,
+        ];
+
+        if ($this->messages->exists($params)) {
             return null;
         }
 

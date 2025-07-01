@@ -25,7 +25,7 @@ class ClientRepository extends AbstractRepository
      *
      * @return Client|null
      */
-    public function findOne(array $params): Client|null
+    public function find(array $params): Client|null
     {
         return Client::findOne($params);
     }
@@ -39,7 +39,7 @@ class ClientRepository extends AbstractRepository
      */
     public function make(array $params): Client
     {
-        $client = $this->findOne($params);
+        $client = $this->find($params);
 
         if (!$client) {
             $client = Client::create($params);
@@ -48,5 +48,4 @@ class ClientRepository extends AbstractRepository
 
         return $client;
     }
-
 }
